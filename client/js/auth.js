@@ -1,0 +1,103 @@
+import { config } from "/js/config.js";
+
+const login_inp = document.getElementById("login_inp");
+const password_inp = document.getElementById("password_inp");
+const password2_inp = document.getElementById("password2_inp"); // может быть null
+const password_btn = document.getElementById("password_btn");
+const text_spn = document.getElementById("text_spn");
+
+const register_btn = document.getElementById("register_btn"); // может быть null
+const login_btn = document.getElementById("login_btn"); // может быть null
+
+// Показ/скрытие пароля
+password_btn.onclick = () => {
+    password_inp.type = password_inp.type === "text" ? "password" : "text";
+};
+
+// Проверка совпадения паролей (только для регистрации)
+if (password2_inp) {
+    password2_inp.addEventListener("input", () => {
+        text_spn.textContent =
+            password_inp.value !== password2_inp.value
+                ? "Пароли не совпадают"
+                : "";
+    });
+}
+
+// Общая функция отправки
+async function sendAuth(url, body) {
+    let response = await fetch(config.server.url + url, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(body)
+    });
+
+    return response;
+}
+
+// Регистрация
+if (register_btn) {
+    register_btn.onclick = async () => {
+        if (login_inp.value.length < config.minLengthLogin) {
+            text_spn.textContent = "Длина логина должна быть больше " + config.minLengthLogin;
+            return;
+        }
+
+        if (password_inp.value.length < config.minLengthPassword) {
+            text_spn.textContent = "Длина пароля должна быть больше " + config.minLengthPassword;
+            return;
+        }
+
+        if (password_inp.value !== password2_inp.value) {
+            text_spn.textContent = "Пароли не совпадают";
+            return;
+        }
+
+        text_spn.textContent = "";
+
+        let response = await sendAuth("auth/register", {
+            login: login_inp.value,
+            password: password_inp.value
+        });
+
+        if (response.ok)
+            location.href = "/";
+        else if (response.status === 409)
+            text_spn.textContent = "Пользователь уже существует";
+        else if (response.status === 429)
+            text_spn.textContent = "Слишком много попыток, попробуйте позже";
+        else
+            text_spn.textContent = "Неизвестная ошибка";
+    };
+}
+
+// Логин
+if (login_btn) {
+    login_btn.onclick = async () => {
+        if (login_inp.value.length < config.minLengthLogin) {
+            text_spn.textContent = "Длина логина должна быть больше " + config.minLengthLogin;
+            return;
+        }
+
+        if (password_inp.value.length < config.minLengthPassword) {
+            text_spn.textContent = "Длина пароля должна быть больше " + config.minLengthPassword;
+            return;
+        }
+
+        text_spn.textContent = "";
+
+        let response = await sendAuth("auth/login", {
+            login: login_inp.value,
+            password: password_inp.value
+        });
+
+        if (response.ok)
+            location.href = "/";
+        else if (response.status === 401)
+            text_spn.textContent = "Неверный логин или пароль";
+        else if (response.status === 429)
+            text_spn.textContent = "Слишком много попыток, попробуйте позже";
+        else
+            text_spn.textContent = "Неизвестная ошибка";
+    };
+}

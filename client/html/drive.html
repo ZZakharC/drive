@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/style/main.css">
+    <script type="module" src="/js/main.js" defer></script>
+    <title>Drive</title>
+</head>
+
+<body>
+    <!-- TOP BAR -->
+    <div class="top-bar">
+        <button id="admin_panel_btn" class="admin-panel off" onclick="location.href='/admin'">Админ панель</button>
+        <span class="rules">Ваши права: <span class="text-block" id="rules_spn"></span></span>
+        <span class="name" id="name_spn"></span>
+    </div>
+
+    <!-- MAIN BAR -->
+    <div class="main-bar" id="container">
+        <!-- File preview -->
+        <div class="file-preview" id="preview_div">
+            <h1 id="preview_name_spn"></h1>
+
+            <img id="preview_img" src="/img/file.png" alt="">
+
+            <div class="info">
+                <span>Путь: <span class="data-span" id="preview_path_spn"></span></span>
+                <span>Размер: <span class="data-span" id="preview_size_spn"></span></span>
+                <span>Дата создания: <span class="data-span" id="preview_date_spn"></span></span>
+            </div>
+
+            <div class="control">
+                <button id="preview_download_btn">Скачать</button>
+                <button class="red disable" id="preview_delete_btn">Удалить</button>
+            </div>
+        </div>
+
+        <!-- New Menu -->
+        <div class="new-menu menu" id="new_menu_div">
+            <div class="option" id="new_menu_open_create_dir_btn">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M12 12h2v-2h2v2h2v2h-2v2h-2v-2h-2v-2zm10-4v10c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2l.01-12c0-1.1.89-2 1.99-2h6l2 2h8c1.1 0 2 .9 2 2zm-2 0H4v10h16V8z">
+                    </path>
+                </svg>
+                <span>Создать папку</span>
+            </div>
+
+            <div class="hr"></div>
+
+            <div class="option" id="upload_file_btn">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z">
+                    </path>
+                    <path d="M8 15.01l1.41 1.41L11 14.84V19h2v-4.16l1.59 1.59L16 15.01 12.01 11z"></path>
+                </svg>
+                <span>Загрузить файл</span>
+                <input type="file" id="upload_file_inp" hidden>
+            </div>
+        </div>
+        <button title="Создать директорию или загрузить файл" class="new-menu-open-button disable"
+            id="new_menu_open_btn">
+            <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M20 13h-7v7h-2v-7H4v-2h7V4h2v7h7v2z"></path>
+            </svg>
+        </button>
+
+        <!-- Create Dir -->
+        <div class="create-dir" id="create_dir_div">
+            <h2>Новая папка</h2>
+            <input type="text" id="create_dir_inp">
+            <button id="create_dir_btn">Создать</button>
+        </div>
+        
+        <!-- File Menu -->
+        <div class="file-menu menu" id="file_menu_div">
+            <div class="option" id="file_menu_download_btn">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M4 15h2v3h12v-3h2v3c0 1.1-.9 2-2 2H6c-1.1 0-2-.9-2-2m11.59-8.41L13 12.17V4h-2v8.17L8.41 9.59 7 11l5 5 5-5-1.41-1.41z">
+                    </path>
+                </svg>
+                <span>Скачать файл</span>
+            </div>
+
+            <div class="hr"></div>
+
+            <div class="option" id="file_menu_delete_btn">
+                <svg viewBox="0 0 24 24">
+                    <path d="M0 0h24v24H0V0z" fill="none"></path>
+                    <path
+                        d="M15 4V3H9v1H4v2h1v13c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V6h1V4h-5zm2 15H7V6h10v13zM9 8h2v9H9zm4 0h2v9h-2z">
+                    </path>
+                </svg>
+                <span>Удалить файл</span>
+            </div>
+        </div>
+
+        <!-- Path -->
+        <div class="path">
+            <button class="off" title="Полнятся на директорию выше" id="up_dir_btn">
+                <svg viewBox="0 0 24 24">
+                    <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path>
+                </svg>
+            </button>
+            <span title="Директория в которой вы находитесь" class="text-block" id="path_spn">/</span>
+        </div>
+
+        <!-- File container -->
+        <div id="files_container" class="files-container"></div>
+    </div>
+    <!-- BOTTOM BAR -->
+    <div class="bottom-bar">
+        <span id="file_name_spn"></span>
+        <span id="file_type_spn"></span>
+        <span id="file_size_spn"></span>
+        <span id="file_data_spn"></span>
+    </div>
+</body>
+
+</html>

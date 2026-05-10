@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/style/main.css">
+    <link rel="stylesheet" href="/style/admin.css">
+    <script type="module" src="/js/admin.js" defer></script>
+    <title>Admin</title>
+</head>
+
+<body>
+    <!-- TOP BAR -->
+    <div class="top-bar">
+        <button class="drive" onclick="location.href='/'">Диск</button>
+        <div>
+        </div>
+        <span class="name" id="name_spn"></span>
+    </div>
+    <!-- MAIN BAR -->
+    <div class="main-bar" id="users_container">
+        <div class="user">
+            <h3>id:Имя</h3>
+            <h3>Права R/C/A</h3>
+            <h3>Удаления</h3>
+        </div>
+    </div>
+    <!-- BOTTOM BAR -->
+    <div class="bottom-bar">
+        <button class="apply off" id="apply_btn">Применить</button>
+    </div>
+</body>
+</html>
