@@ -293,15 +293,15 @@ export async function app(req, res) {
         // Удаления пользователя по id
         if (pathname.startsWith("/admin/users/")) {
             const rep = await requireUser(req);
+            const userId = Number(pathname.replace("/admin/users/", ""));
 
             if (!rep.ok) {
                 res.writeHead(rep.error);
                 res.end();
-            } else if (!(rep.user.rules & 4)) {
+            } else if (!(rep.user.rules & 4) || userId === 0) {
                 res.writeHead(403);
                 res.end();
             } else {
-                const userId = Number(pathname.replace("/admin/users/", ""));
                 const code = await deleteUser(userId); // не удаляет root'а
 
                 res.writeHead(code);

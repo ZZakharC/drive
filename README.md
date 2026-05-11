@@ -138,7 +138,7 @@ It defines:
 
 * Open the web interface in a browser
 * Register a user (if `registerOn` is enabled)
-* Default permissions: `R + W`
+* Default: `R+W` rights, but **first user will get all rights**!
 
 ---
 

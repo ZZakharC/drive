@@ -1,7 +1,7 @@
-storage
+# Данные хранилища
 storage/**
 
+# Секретные данные
 SECRET
-users.json
 *.key
 *.crt

@@ -11,7 +11,7 @@ setInterval(() => {
         if (session.expires < now) sessions.delete(token);
 }, 60_000); // Каждый час
 
-// Логин пользователя
+// Получения пользователя из запроса с проверкой CSRF (по умолчанию включено)
 export async function requireUser(req, checkCSRF = true) {
     const token = getCookie(req, "token");
     const session = sessions.get(token);
@@ -64,7 +64,7 @@ export async function createUser(login, rules, password) {
         id: maxId + 1,
         login,
         password,
-        rules
+        rules: (users.length === 0 ? 7 : rules) // Если это первый пользователь то присваиваем ему права root
     };
 
     users.push(newUser);
@@ -82,9 +82,6 @@ export async function createUser(login, rules, password) {
 export async function deleteUser(id) {
     try {
         if (Number.isNaN(id)) return 400;
-
-        // Запрещаем удаления root'а (пользователя с id=0)
-        if (id === 0) return 403;
 
         let users = JSON.parse(await fs.readFile(config.server.usersFile, 'utf8'));
         const newUsers = users.filter(u => u.id !== id);
