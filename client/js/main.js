@@ -349,7 +349,7 @@ let dragCounter = 0;
 
 mainContainer.addEventListener('dragenter', (e) => {
     e.preventDefault();
-    if (!(user.rules & config.rule.CHANGE) || e.dataTransfer.files.length === 0) return;
+    if (!(user.rules & config.rule.CHANGE)) return;
 
     dragCounter++;
     mainContainer.classList.add('drag');
@@ -357,7 +357,7 @@ mainContainer.addEventListener('dragenter', (e) => {
 
 mainContainer.addEventListener('dragleave', (e) => {
     e.preventDefault();
-    if (!(user.rules & config.rule.CHANGE) || e.dataTransfer.files.length === 0) return;
+    if (!(user.rules & config.rule.CHANGE)) return;
 
     dragCounter--;
     if (dragCounter <= 0) {

@@ -1,6 +1,6 @@
 export const config = {
     server: {
-        "url": "https://192.168.0.159:3000/",
+        "url": "https://localhost:3000/",
     },
     minLengthLogin: 4,
     minLengthPassword: 6,

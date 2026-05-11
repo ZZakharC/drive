@@ -99,6 +99,7 @@ openssl req -x509 -newkey rsa:4096 \
 
 ```bash
 export SALT="your-cryptographically-secure-salt"
+# Генерация crypto.randomBytes(128).toString('hex');
 ```
 
 Используется для хеширования паролей.

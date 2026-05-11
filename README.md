@@ -99,6 +99,7 @@ Required variable:
 
 ```bash
 export SALT="your-cryptographically-secure-salt"
+# Generation crypto.randomBytes(128).toString('hex');
 ```
 
 Used for password hashing.

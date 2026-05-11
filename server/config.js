@@ -1,7 +1,7 @@
 export const config = {
     server: {
         port: 3000, // 80 чтобы сервер открывался на host по умолчанию
-        host: "192.168.0.159",
+        host: "localhost",
         https: {
             keyFilePath: "./server.key",
             certFilePath: "./server.crt",
