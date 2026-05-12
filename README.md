@@ -93,7 +93,7 @@ openssl req -x509 -newkey rsa:4096 \
 
 ---
 
-### 4. Start the server
+### 3. Start the server
 
 ```bash
 node server.js
@@ -122,7 +122,7 @@ It defines:
 
 ---
 
-### 5. First launch
+### 4. First launch
 
 * Open the web interface in a browser
 * Register a user (if `registerOn` is enabled)
