@@ -1,5 +1,6 @@
 import { config } from "./config.js";
 import { getCookie } from "./tools.js";
+import crypto from "node:crypto";
 import fs from "node:fs/promises";
 
 const sessions = new Map();
@@ -98,8 +99,8 @@ export async function deleteUser(id) {
         );
 
         // Убираем сессию пользователя
-        for (const [token, userId] of sessions)
-            if (userId === id) sessions.delete(token);
+        for (const [token, session] of sessions)
+            if (session.id === id) sessions.delete(token);
 
         return 200;
     } catch (error) {
