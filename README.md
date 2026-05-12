@@ -93,19 +93,6 @@ openssl req -x509 -newkey rsa:4096 \
 
 ---
 
-### 3. Environment configuration
-
-Required variable:
-
-```bash
-export SALT="your-cryptographically-secure-salt"
-# Generation openssl rand -hex 128
-```
-
-Used for password hashing.
-
----
-
 ### 4. Start the server
 
 ```bash
@@ -131,6 +118,7 @@ It defines:
 * request limits
 * session lifetime
 * registration enable/disable flag
+* etc.
 
 ---
 

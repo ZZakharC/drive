@@ -82,11 +82,22 @@ export function getCookie(req, name) {
 }
 
 // Хеш пароля
-export function hashPassword(password) {
-    return crypto.pbkdf2Sync(password, config.server.salt, 100000, 64, 'sha256').toString('hex');
+export function hashPassword(password, salt = null) {
+    // Если соль передана то используем её иначе генерируем новую
+    salt ??= crypto.randomBytes(config.server.hashPassword.saltLength).toString("hex");
+    
+    const hash = crypto.pbkdf2Sync(
+        password,
+        salt,
+        config.server.hashPassword.iterations, 
+        config.server.hashPassword.hashLength, 
+        config.server.hashPassword.method
+    ).toString('hex');
+
+    return { hash, salt };
 }
 
-// Пароль валидный?
+// Проверка пароля на валидность
 export function validatePassword(password) {
     if (!password) return false;
 
@@ -98,7 +109,7 @@ export function validatePassword(password) {
     return regex.test(password);
 }
 
-// Логин валидный?
+// Проверка логина на валидность
 export function validateLogin(login) {
     if (!login) return false;
 

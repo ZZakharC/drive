@@ -6,12 +6,17 @@ export const config = {
             keyFilePath: "./server.key",
             certFilePath: "./server.crt",
         },
-        salt: process.env.SALT, // Соль для хеширования пароля
         usersFile: "./users.json", // users db
         drivePath: "./storage/", // Диск
         registerOn: 1, // Включена ли регистрация (если false то /register GET/POST не будут обрабатываться)
         minLengthLogin: 4,
         minLengthPassword: 6,
+        hashPassword: {
+            iterations: 500_000,
+            hashLength: 64,
+            saltLength: 32,
+            method: "sha512",
+        },
         maxBodySize: 1_000_000, // 75.56 MB
         sessionTime: 86_400_000, // 24 hours
         rateLimit: {

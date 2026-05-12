@@ -3,6 +3,11 @@ import { deleteFile, downloadFile, createDir, listFiles, loadFile } from "./driv
 import { serveFile, getBody, hashPassword, rateLimiter, validateLogin, validatePassword } from "./tools.js";
 import { findUser, requireUser, loginUser, getUsers, deleteUser, createUser, changeUsers } from "./users.js";
 
+function notFound(res) {
+    res.writeHead(404);
+    res.end();
+}
+
 export async function app(req, res) {
     const { method, url } = req;
     const parsedUrl = new URL(url, `http://${req.headers.host}`);
@@ -30,7 +35,7 @@ export async function app(req, res) {
             } else {
                 const user = await findUser(data.login);
 
-                if (user && user.password === hashPassword(data.password))
+                if (user && user.hashPassword === hashPassword(data.password, user.salt).hash)
                     loginUser(res, user);
                 else {
                     res.writeHead(401, { "Content-Type": "application/json" });
@@ -42,7 +47,7 @@ export async function app(req, res) {
         // Регистрация
         else if (pathname.startsWith("/auth/register") && config.server.registerOn) {
             if (!rateLimiter(req, res)) return;
-            
+
             let data = null;
             try {
                 data = await getBody(req);
@@ -54,10 +59,10 @@ export async function app(req, res) {
                 res.writeHead(400);
                 res.end();
             } else {
-                const user = await createUser(data.login, config.client.defaultRules, hashPassword(data.password));
+                const user = await createUser(data.login, config.client.defaultRules, data.password);
                 if (user === 409) {
-                    res.writeHead(409, { "Content-Type": "application/json" });
-                    res.end(JSON.stringify({ ok: false }));
+                    res.writeHead(409);
+                    res.end();
                 } else
                     loginUser(res, user);
             }
@@ -87,9 +92,9 @@ export async function app(req, res) {
                 } else {
                     // Не изменяем права root'a (пользователя с id=0)
                     data.users = data.users.filter(u => u.id !== 0);
-                    
+
                     changeUsers(data.users);
-                    
+
                     res.writeHead(200, { "Content-Type": "application/json" });
                     res.end(JSON.stringify({ ok: true }));
                 }
@@ -114,10 +119,7 @@ export async function app(req, res) {
         }
 
         // 404
-        else {
-            res.writeHead(404);
-            res.end();
-        }
+        else notFound(res);
     }
 
     // --------- POST ----------
@@ -144,10 +146,7 @@ export async function app(req, res) {
         }
 
         // 404
-        else {
-            res.writeHead(404);
-            res.end();
-        }
+        else notFound(res);
     }
 
     // ---------- GET ----------
@@ -157,7 +156,7 @@ export async function app(req, res) {
         if (pathname === "/auth/me") {
             const rep = await requireUser(req, false); // Не проверяем CSRF
 
-            if (!rep.ok) { 
+            if (!rep.ok) {
                 res.writeHead(rep.error);
                 res.end();
             } else {
@@ -281,10 +280,7 @@ export async function app(req, res) {
 
         // ---------- 404 ----------
 
-        else {
-            res.writeHead(404);
-            res.end();
-        }
+        else notFound(res);
     }
 
     // -------- DELETE ---------
@@ -329,16 +325,10 @@ export async function app(req, res) {
         }
 
         // 404
-        else {
-            res.writeHead(404);
-            res.end();
-        }
+        else notFound(res);
     }
 
     // ---------- 404 ----------
 
-    else {
-        res.writeHead(404);
-        res.end();
-    }
+    else notFound(res);
 }

@@ -1,5 +1,5 @@
 import { config } from "./config.js";
-import { getCookie } from "./tools.js";
+import { getCookie, hashPassword } from "./tools.js";
 import crypto from "node:crypto";
 import fs from "node:fs/promises";
 
@@ -60,11 +60,13 @@ export async function createUser(login, rules, password) {
     if (users.some(user => user.login === login))
         return 409;
 
+    const hash = hashPassword(password);
     const maxId = users.reduce((max, u) => Math.max(max, u.id), -1);
     const newUser = {
         id: maxId + 1,
         login,
-        password,
+        salt: hash.salt,
+        hashPassword: hash.hash,
         rules: (maxId === -1 ? 7 : rules) // Если это первый пользователь то присваиваем ему права root
     };
 
@@ -98,7 +100,7 @@ export async function deleteUser(id) {
             'utf8'
         );
 
-        // Убираем сессию пользователя
+        // Удаляем сессию пользователя
         for (const [token, session] of sessions)
             if (session.id === id) sessions.delete(token);
 
