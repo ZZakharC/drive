@@ -9,6 +9,22 @@ const text_spn = document.getElementById("text_spn");
 const register_btn = document.getElementById("register_btn"); // может быть null
 const login_btn = document.getElementById("login_btn"); // может быть null
 
+// Для валидации
+const loginRegex = /^[a-zA-Z0-9._-]{4,50}$/;
+const passwordRegex = /^[\x20-\x7E]{6,100}$/;
+
+function validateCredentials(login, password) {
+    if (!loginRegex.test(login)) {
+        return "Некорректный логин";
+    }
+
+    if (!passwordRegex.test(password)) {
+        return "Некорректный пароль";
+    }
+
+    return null;
+}
+
 // Показ/скрытие пароля
 password_btn.onclick = () => {
     password_inp.type = password_inp.type === "text" ? "password" : "text";
@@ -53,6 +69,12 @@ if (register_btn) {
             return;
         }
 
+        const error = validateCredentials(login_inp.value, password_inp.value);
+        if (error) {
+            text_spn.textContent = error;
+            return;
+        }
+
         text_spn.textContent = "";
 
         let response = await sendAuth("auth/register", {
@@ -81,6 +103,12 @@ if (login_btn) {
 
         if (password_inp.value.length < config.minLengthPassword) {
             text_spn.textContent = "Длина пароля должна быть больше " + config.minLengthPassword;
+            return;
+        }
+
+        const error = validateCredentials(login_inp.value, password_inp.value);
+        if (error) {
+            text_spn.textContent = error;
             return;
         }
 
