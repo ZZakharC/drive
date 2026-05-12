@@ -52,6 +52,7 @@ try {
 let path = "/";
 let rootDir = null;
 let realDir = null;
+const activeUploads = new Set();
 
 // Контейнеры
 const mainContainer = document.getElementById("container");
@@ -88,6 +89,11 @@ const createDirDiv = document.getElementById('create_dir_div');
 const createDirBtn = document.getElementById('create_dir_btn');
 const createDirInp = document.getElementById('create_dir_inp');
 
+// Список загружаемых файлов
+const downloadListDiv = document.getElementById('download_list_div');
+const downloadListCloseBtn = document.getElementById('download_list_close_btn');
+const downloadListContainer = document.getElementById('download_list_container');
+
 // Инфо о файле в bottom-bar
 const bottomNameSpn = document.getElementById("file_name_spn");
 const bottomTypeSpn = document.getElementById("file_type_spn");
@@ -97,29 +103,50 @@ const bottomDateSpn = document.getElementById("file_data_spn");
 /* --------------------- Server API --------------------- */
 
 // Отправка файла на сервер 
-async function uploadFile(file) {
-    const formData = new FormData();
-    formData.append('file', file);
+function uploadFile(file, onProgress) {
+    return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
 
-    const response = await fetch(config.server.url + 'drive' + path, {
-        method: 'POST',
-        headers: {
-            "x-csrf-token": csrfToken
-        },
-        body: formData   // заголовок Content-Type браузер установит автоматически
+        activeUploads.add(xhr);
+
+        xhr.open("POST", config.server.url + "drive" + path);
+        xhr.setRequestHeader("x-csrf-token", csrfToken);
+        xhr.upload.onprogress = (event) => {
+            if (event.lengthComputable) {
+                const percent = (event.loaded / event.total) * 100;
+
+                onProgress?.({
+                    loaded: event.loaded,
+                    total: event.total,
+                    percent: percent.toFixed(2)
+                });
+            }
+        };
+
+        xhr.onload = () => {
+            activeUploads.delete(xhr);
+            if (xhr.status !== 200) {
+                alert("Error: " + xhr.status);
+
+                try {
+                    reject(JSON.parse(xhr.responseText));
+                } catch {
+                    reject(null);
+                }
+            } else
+                resolve(xhr.status);
+        };
+
+        xhr.onerror = () => {
+            activeUploads.delete(xhr);
+            alert("Error: Network");
+            reject("Network error");
+        }
+
+        const formData = new FormData();
+        formData.append("file", file);
+        xhr.send(formData);
     });
-
-    if (!response.ok) {
-        alert('Error: ' + response.status);
-        return null;
-    }
-
-    try {
-        const result = await response.json();
-        return result;
-    } catch (error) {
-        return null;
-    }
 }
 
 // Скачивания файла
@@ -157,6 +184,14 @@ async function deleteFile(url) {
 
     alert("Error: " + res.status);
     return false;
+}
+
+// Отмена всех загрузок на сервер
+function cancelAllUploads() {
+    for (const xhr of activeUploads)
+        xhr.abort();
+
+    activeUploads.clear();
 }
 
 /* -------------------- Render files -------------------- */
@@ -273,7 +308,7 @@ function renderFiles(files) {
         });
     });
 
-    fContainer.innerHTML = "";
+    fContainer.innerText = "";
     files.forEach(file => {
         renderFile(file);
     });
@@ -375,7 +410,10 @@ mainContainer.addEventListener('drop', async (e) => {
     const dt = e.dataTransfer;
     if (dt && dt.files && dt.files.length > 0) {
         for (const file of dt.files) {
-            const res = await uploadFile(file);
+            const prog = downloadListAdd(file.name);
+            let res = await uploadFile(file, (p) => {
+                downloadListUpdate(p, prog.progress, prog.percent);
+            });
 
             if (res) {
                 const index = realDir.findIndex(f => f.name === file.name);
@@ -545,7 +583,10 @@ newMenuUploadFileInp.addEventListener('change', async () => {
     const file = newMenuUploadFileInp.files[0];
     if (!file) return; // пользователь нажал «Отмена»
 
-    const res = await uploadFile(file);
+    const prog = downloadListAdd(file.name);
+    let res = await uploadFile(file, (p) => {
+        downloadListUpdate(p, prog.progress, prog.percent);
+    });
 
     if (res) {
         const index = realDir.findIndex(f => f.name === file.name);
@@ -614,3 +655,57 @@ createDirBtn.addEventListener("click", async () => {
         createDirInp.value = '';
     }
 });
+
+/* ------------------- Download list -------------------- */
+
+downloadListCloseBtn.addEventListener("click", () => {
+    if (activeUploads.size !== 0 && // Если есть активные загрузки
+        !confirm(`Отменить все загрузки?`)
+    ) return;
+
+    cancelAllUploads();
+    downloadListContainer.innerText = "";
+    mainContainer.classList.remove("download-list");
+});
+
+function downloadListAdd(name) {
+    const ext = name.split('.').pop().toLowerCase();
+
+    const file = document.createElement("div");
+    file.classList.add("file");
+
+    const img = document.createElement("img");
+    img.src = `img/${config.file_map[ext] || config.file_map["default"]}.png`;
+
+    const fName = document.createElement("span");
+    fName.textContent = name;
+    fName.classList.add("name");
+
+    const progress = document.createElement("progress");
+    progress.max = 100;
+    progress.value = 0
+
+    const percent = document.createElement("span");
+    percent.textContent = "0%";
+    percent.classList.add("percent");
+
+    file.appendChild(img);
+    file.appendChild(fName);
+    file.appendChild(progress);
+    file.appendChild(percent);
+
+    downloadListContainer.appendChild(file);
+    mainContainer.classList.add("download-list");
+
+    return { progress, percent };
+}
+
+function downloadListUpdate(p, progress, percent) {
+    percent.textContent = p.percent + "%";
+    progress.value = p.percent;
+
+    if (p.percent == 100) {
+        progress.classList.add("finish");
+        percent.classList.add("finish");
+    }
+}

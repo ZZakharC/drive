@@ -16,6 +16,7 @@
     --color-default-dim: #a8a8a8;
     --color-act: #b84dff;
     --color-red: #f20c0c;
+    --color-green: #46f20c;
     --color-act-dim: rgba(184, 77, 255, 0.85);
 
     /* Shadow */
@@ -259,6 +260,12 @@ button {
         }
     }
 
+    &.download-list {
+        .download-list {
+            display: block;
+        }
+    }
+
     // Меню
     .menu {
         position: fixed;
@@ -442,6 +449,107 @@ button {
 
         button {
             font-size: 1.1em;
+        }
+    }
+
+    // Список загружаемых файлов
+    .download-list {
+        display: none;
+        position: fixed;
+        background: var(--bg-color-elem);
+        border: 1px solid var(--bar-border-color-2);
+        transition: all 0.25s ease;
+        border-radius: var(--radius);
+        left: 15px;
+        bottom: calc(var(--bottom-bar-height) + 20px);
+
+        &:hover {
+            border: 1px solid var(--bar-border-color-3);
+        }
+
+        .header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.3em;
+            padding: 5px;
+            padding-bottom: 10px;
+            margin-bottom: 5px;
+            border-bottom: 1px solid var(--bar-border-color-2);
+
+            button {
+                padding: 7px;
+
+                svg {
+                    width: 15px;
+                    height: 15px;
+                }
+            }
+        }
+
+        .download-files-container {
+            max-height: 30vh;
+            overflow-y: auto;
+            scrollbar-width: none;
+
+            .file {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                width: 360px;
+                padding: 10px;
+                padding-top: 5px;
+                padding-bottom: 5px;
+                margin-top: 10px;
+                margin-bottom: 10px;
+
+                &:hover {
+                    background: var(--bg-color-elem-hover);
+                }
+
+                img {
+                    user-select: none;
+                    width: 20px;
+                }
+
+                .name {
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                }
+
+                progress {
+                    -webkit-appearance: none;
+                    height: 7px;
+                    margin: 0 5px 0 5px;
+                    appearance: none;
+                    border: 1px solid var(--bar-border-color-2);
+
+                    &::-webkit-progress-bar {
+                        background-color: var(--bg-color-elem-hover);
+                    }
+
+                    &::-webkit-progress-value {
+                        background-color: var(--color-act);
+                    }
+
+                    &.finish {
+                        &::-webkit-progress-value {
+                            background-color: var(--color-green);
+                        }
+                    }
+                }
+
+                .percent {
+                    font-family: monospace;
+                    width: auto;
+
+                    &.finish {
+                        color: var(--color-green);
+                    }
+                }
+            }
         }
     }
 

@@ -15,6 +15,7 @@
   --color-default-dim: #a8a8a8;
   --color-act: #b84dff;
   --color-red: #f20c0c;
+  --color-green: #46f20c;
   --color-act-dim: rgba(184, 77, 255, 0.85);
   /* Shadow */
   --color-shadow-act: color-mix(in srgb, var(--color-act) 40%, transparent 60%);
@@ -217,6 +218,9 @@ button:active, button.red:active {
 .main-bar.create-dir .create-dir {
   display: flex;
 }
+.main-bar.download-list .download-list {
+  display: block;
+}
 .main-bar .menu {
   position: fixed;
   display: none;
@@ -371,6 +375,91 @@ button:active, button.red:active {
 }
 .main-bar .create-dir button {
   font-size: 1.1em;
+}
+.main-bar .download-list {
+  display: none;
+  position: fixed;
+  background: var(--bg-color-elem);
+  border: 1px solid var(--bar-border-color-2);
+  transition: all 0.25s ease;
+  border-radius: var(--radius);
+  left: 15px;
+  bottom: calc(var(--bottom-bar-height) + 20px);
+}
+.main-bar .download-list:hover {
+  border: 1px solid var(--bar-border-color-3);
+}
+.main-bar .download-list .header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.3em;
+  padding: 5px;
+  padding-bottom: 10px;
+  margin-bottom: 5px;
+  border-bottom: 1px solid var(--bar-border-color-2);
+}
+.main-bar .download-list .header button {
+  padding: 7px;
+}
+.main-bar .download-list .header button svg {
+  width: 15px;
+  height: 15px;
+}
+.main-bar .download-list .download-files-container {
+  max-height: 30vh;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.main-bar .download-list .download-files-container .file {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 360px;
+  padding: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.main-bar .download-list .download-files-container .file:hover {
+  background: var(--bg-color-elem-hover);
+}
+.main-bar .download-list .download-files-container .file img {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  width: 20px;
+}
+.main-bar .download-list .download-files-container .file .name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.main-bar .download-list .download-files-container .file progress {
+  -webkit-appearance: none;
+  height: 7px;
+  margin: 0 5px 0 5px;
+  -moz-appearance: none;
+       appearance: none;
+  border: 1px solid var(--bar-border-color-2);
+}
+.main-bar .download-list .download-files-container .file progress::-webkit-progress-bar {
+  background-color: var(--bg-color-elem-hover);
+}
+.main-bar .download-list .download-files-container .file progress::-webkit-progress-value {
+  background-color: var(--color-act);
+}
+.main-bar .download-list .download-files-container .file progress.finish::-webkit-progress-value {
+  background-color: var(--color-green);
+}
+.main-bar .download-list .download-files-container .file .percent {
+  font-family: monospace;
+  width: auto;
+}
+.main-bar .download-list .download-files-container .file .percent.finish {
+  color: var(--color-green);
 }
 .main-bar {
   /* ===== Видны всегда ===== */

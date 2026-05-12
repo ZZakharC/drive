@@ -18,7 +18,7 @@
     </div>
 
     <!-- MAIN BAR -->
-    <div class="main-bar" id="container">
+    <div class="main-bar download-list" id="container">
         <!-- File preview -->
         <div class="file-preview" id="preview_div">
             <h1 id="preview_name_spn"></h1>
@@ -74,7 +74,7 @@
             <input type="text" id="create_dir_inp">
             <button id="create_dir_btn">Создать</button>
         </div>
-        
+
         <!-- File Menu -->
         <div class="file-menu menu" id="file_menu_div">
             <div class="option" id="file_menu_download_btn">
@@ -101,7 +101,7 @@
 
         <!-- Path -->
         <div class="path">
-            <button class="off" title="Полнятся на директорию выше" id="up_dir_btn">
+            <button class="off" title="Подняться на директорию выше" id="up_dir_btn">
                 <svg viewBox="0 0 24 24">
                     <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path>
                 </svg>
@@ -109,8 +109,50 @@
             <span title="Директория в которой вы находитесь" class="text-block" id="path_spn">/</span>
         </div>
 
+        <!-- Download list -->
+        <div class="download-list" id="download_list_div">
+            <div class="header">
+                <span>Загрузка файлов</span>
+                <button id="download_list_close_btn">
+                    <svg viewBox="0 0 10 10">
+                        <polygon class="a-s-fa-Ha-pa"
+                            points="10,1.01 8.99,0 5,3.99 1.01,0 0,1.01 3.99,5 0,8.99 1.01,10 5,6.01 8.99,10 10,8.99 6.01,5 ">
+                        </polygon>
+                    </svg>
+                </button>
+            </div>
+            <div class="download-files-container" id="download_list_container">
+                <div class="file"><img src="img/pdf.png"><span class="name">basic-text.pdf</span><progress max="100"
+                        value="100"></progress><span class="percent">100.00%</span></div>
+                <div class="file"><img src="img/pdf.png"><span class="name">basic-text.pdf</span><progress max="100"
+                        value="100"></progress><span class="percent">100.00%</span></div>
+                <div class="file"><img src="img/svg.png"><span class="name">eye-svgrepo-com.svg</span><progress
+                        max="100" value="100"></progress><span class="percent">100.00%</span></div>
+                <div class="file"><img src="img/jpg.png"><span
+                        class="name">pexels-photo-1125776-91557384.jpg</span><progress max="100"
+                        value="100"></progress><span class="percent">100.00%</span></div>
+                <div class="file"><img src="img/html.png"><span class="name">rgosh;u.html</span><progress max="100"
+                        value="100"></progress><span class="percent">100.00%</span></div>
+                <div class="file"><img src="img/zip.png"><span class="name">sample-1.zip</span><progress max="100"
+                        value="100"></progress><span class="percent">100.00%</span></div>
+                <div class="file"><img src="img/jpg.png"><span
+                        class="name">pexels-photo-1125776-91557384.jpg</span><progress max="100"
+                        value="100"></progress><span class="percent">100.00%</span></div>
+                <div class="file"><img src="img/html.png"><span class="name">rgosh;u.html</span><progress max="100"
+                        value="100"></progress><span class="percent">100.00%</span></div>
+                <div class="file"><img src="img/zip.png"><span class="name">sample-1.zip</span><progress max="100"
+                        value="100"></progress><span class="percent">100.00%</span></div>
+                <div class="file"><img src="img/svg.png"><span
+                        class="name">uiogywefiougwefiohugwefoiuwefowefoihuwefoihuwefohuiwefoihwefiophefwsiohpwsfvdiophsfdohuisviohusvdiohusdvhiousdfvhiousdvhikpjsdfobjughuoysdouyifsewuoetfrgjlhwefrtgjkfesolghujfsvogujsdfvoguhdfsv.svg</span><progress
+                        max="100" value="100"></progress><span class="percent">100.00%</span></div>
+                <div class="file"><img src="img/jpg.png"><span
+                        class="name">yh80цуа8з9щнрцefo08fu8io0hgewfwefquogwef.png</span><progress max="100"
+                        value="100"></progress><span class="percent">100.00%</span></div>
+            </div>
+        </div>
+
         <!-- File container -->
-        <div id="files_container" class="files-container"></div>
+        <div class="files-container" id="files_container"></div>
     </div>
     <!-- BOTTOM BAR -->
     <div class="bottom-bar">
