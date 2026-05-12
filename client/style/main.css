@@ -265,7 +265,7 @@ button:active, button.red:active {
   /* ===== По умолчанию не видны ===== */
 }
 .main-bar .file-preview {
-  position: absolute;
+  position: fixed;
   width: 100%;
   height: 100vh;
   top: 50%;
@@ -417,6 +417,13 @@ button:active, button.red:active {
 }
 .main-bar .files-container .file:hover {
   border: 2px solid var(--color-act);
+}
+.main-bar .files-container .file span {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  display: block;
 }
 .main-bar .files-container .file img {
   width: 100px;
