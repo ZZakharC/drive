@@ -56,15 +56,15 @@ export async function createUser(login, rules, password) {
     let users = JSON.parse(await fs.readFile(config.server.usersFile, 'utf8'));
 
     // Если пользователь есть выходим
-    let isReg = users.find(u => { if (u.login === login) return u });
-    if (isReg) return 409;
+    if (users.some(user => user.login === login))
+        return 409;
 
-    const maxId = users.reduce((max, u) => Math.max(max, u.id), 0);
+    const maxId = users.reduce((max, u) => Math.max(max, u.id), -1);
     const newUser = {
         id: maxId + 1,
         login,
         password,
-        rules: (users.length === 0 ? 7 : rules) // Если это первый пользователь то присваиваем ему права root
+        rules: (maxId === -1 ? 7 : rules) // Если это первый пользователь то присваиваем ему права root
     };
 
     users.push(newUser);
