@@ -30,7 +30,7 @@ The backend is implemented in **pure** Node.js (no frameworks), while the fronte
 Bitmask-based permission model:
 
 * **R** — read
-* **W** — write / modify
+* **C** — change
 * **A** — administration
 
 Flexible combination of permissions at the user level.
@@ -126,7 +126,7 @@ It defines:
 
 * Open the web interface in a browser
 * Register a user (if `registerOn` is enabled)
-* Default: `R+W` rights, but **first user will get all rights**!
+* Default: `R + C` rights, but **first user will get all rights**!
 
 ---
 
@@ -162,7 +162,7 @@ drive/
 | Bit | Permission |
 | --- | ---------- |
 | 1   | Read (R)   |
-| 2   | Write (W)  |
+| 2   | Change (C) |
 | 4   | Admin (A)  |
 
 Examples:
