@@ -328,6 +328,10 @@ button {
         justify-content: center;
         align-items: center;
         flex-direction: column;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+        white-space: normal;
+        text-align: center;
         background: color-mix(in srgb, var(--bg-color-elem) 95%, transparent 5%);
 
         * {
@@ -536,6 +540,11 @@ button {
 
     /* chips */
     span {
+        margin-left: 5px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        display: block;
         padding: 4px 10px;
         border-radius: 999px;
         background: var(--bg-color-elem);
