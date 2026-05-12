@@ -53,16 +53,19 @@ button {
   border: 1px solid var(--color-act);
   background: linear-gradient(145deg, #2a2a2a, #1f1f1f);
   color: var(--color-act);
+  fill: var(--color-act);
   cursor: pointer;
   transition: all 0.25s ease;
 }
 button.red {
   color: var(--color-red);
+  fill: var(--color-red);
   border: 1px solid var(--color-red);
 }
 button.disable {
   border-color: var(--color-default-dim);
   color: var(--color-default-dim);
+  fill: var(--color-default-dim);
   pointer-events: none;
 }
 button.off {
@@ -319,9 +322,6 @@ button:active, button.red:active {
   bottom: calc(var(--bottom-bar-height) + 20px);
   text-align: center;
   border-radius: 100%;
-}
-.main-bar .new-menu-open-button svg {
-  fill: var(--color-act);
 }
 .main-bar .create-dir {
   position: absolute;
