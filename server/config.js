@@ -17,6 +17,7 @@ export const config = {
             saltLength: 32,
             method: "sha512",
         },
+        maxFileSize: 10737418240, // 10 GB
         maxBodySize: 1_000_000, // 75.56 MB
         sessionTime: 86_400_000, // 24 hours
         rateLimit: {

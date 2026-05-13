@@ -43,49 +43,69 @@ export async function loadFile(req, res, pathFile) {
         }
 
         const boundary = boundaryMatch[1];
-
+        let totalSize = 0;
         let body = [];
 
         req.on("data", chunk => {
+            totalSize += chunk.length;
+
+            if (totalSize > config.server.maxFileSize) {
+                req.destroy(); // останавливаем поток
+                
+                res.writeHead(413);
+                res.end();
+                return;
+            }
+
             body.push(chunk);
         });
 
         req.on("end", async () => {
+            if (totalSize > config.server.maxFileSize) return;
+
             body = Buffer.concat(body);
-            const parts = body.toString("binary").split(`--${boundary}`);
 
-            for (let part of parts) {
-                if (part.includes("filename=")) {
-                    const filenameMatch = part.match(/filename="(.+?)"/);
-                    if (!filenameMatch) continue;
+            let start = body.indexOf(boundary);
+            if (start === -1) {
+                res.writeHead(400);
+                return res.end();
+            }
 
-                    const originalName = path.basename(filenameMatch[1]);
+            while (start !== -1) {
+                let end = body.indexOf(boundary, start + boundary.length);
+                if (end === -1) break;
 
-                    // безопасный путь (куда сохраняем)
-                    const fullPath = getSafePath(path.join(pathFile || "", originalName));
-                    if (!fullPath.ok) {
-                        res.writeHead(fullPath.error);
-                        res.end();
-                        return;
+                const part = body.slice(start + boundary.length, end);
+
+                const headerEnd = part.indexOf("\r\n\r\n");
+                if (headerEnd !== -1) {
+                    const headers = part.slice(0, headerEnd).toString("utf8");
+                    const data = part.slice(headerEnd + 4, part.length - 2); // -2 убирает \r\n
+
+                    if (headers.includes("filename=")) {
+                        const filenameMatch = headers.match(/filename="(.+?)"/);
+                        if (!filenameMatch) continue;
+
+                        const originalName = path.basename(filenameMatch[1]);
+
+                        const fullPath = getSafePath(path.join(pathFile || "", originalName));
+                        if (!fullPath.ok) {
+                            res.writeHead(fullPath.error);
+                            return res.end();
+                        }
+
+                        await fs.writeFile(fullPath.data, data);
+
+                        res.writeHead(200, { "Content-Type": "application/json" });
+                        return res.end(JSON.stringify({
+                            success: true,
+                            name: originalName,
+                            path: fullPath.data.replace(BASE_DIR, "")
+                        }));
                     }
-
-                    // извлекаем тело файла
-                    const start = part.indexOf("\r\n\r\n") + 4;
-                    const end = part.lastIndexOf("\r\n");
-
-                    const fileContent = part.slice(start, end);
-
-                    await fs.writeFile(fullPath.data, fileContent, "binary");
-
-                    res.writeHead(200, { "Content-Type": "application/json" });
-                    res.end(JSON.stringify({
-                        success: true,
-                        name: originalName,
-                        path: fullPath.data.replace(BASE_DIR, "")
-                    }));
-
-                    return;
                 }
+
+                start = end;
             }
 
             res.writeHead(400);
@@ -93,6 +113,7 @@ export async function loadFile(req, res, pathFile) {
         });
 
     } catch (err) {
+        console.error(err);
         res.writeHead(500);
         res.end();
     }
@@ -108,7 +129,7 @@ export async function downloadFile(res, pathFile) {
     } else {
         res.writeHead(200, {
             'Content-Type': 'application/octet-stream',
-            'Content-Disposition': `attachment; filename="${path.basename(fullPath.data)}"`,
+            'Content-Disposition': `attachment; filename="${encodeURIComponent(path.basename(fullPath.data))}"`,
         });
 
         const fileStream = fsNotProm.createReadStream(fullPath.data);
