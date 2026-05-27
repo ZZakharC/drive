@@ -45,6 +45,7 @@ Flexible combination of permissions at the user level.
 
 * HTTPS (self-signed TLS certificate)
 * CSRF protection
+* Session IP Binding
 * Request rate limiting
 * User data isolation
 
@@ -118,6 +119,7 @@ It defines:
 * request limits
 * session lifetime
 * registration enable/disable flag
+* enable session IP address validation
 * etc.
 
 ---

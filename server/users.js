@@ -12,7 +12,7 @@ setInterval(() => {
         if (session.expires < now) sessions.delete(token);
 }, 60_000); // Каждый час
 
-// Получения пользователя из запроса с проверкой CSRF (по умолчанию включено)
+// Получения пользователя из запроса с проверкой CSRF и IP (по умолчанию включено)
 export async function requireUser(req, checkCSRF = true) {
     const token = getCookie(req, "token");
     const session = sessions.get(token);
@@ -26,6 +26,10 @@ export async function requireUser(req, checkCSRF = true) {
         if ((!csrfHeader || csrfHeader !== session.csrf) && checkCSRF)
             return { ok: false, error: 403 };
 
+        // Проверка IP
+        if ((req.socket.remoteAddress !== session.ip) && config.server.checkIP)
+            return { ok: false, error: 403 };
+
         // Пользователь не существует
         const user = await getUser(session.id);
         if (!user)
@@ -36,12 +40,13 @@ export async function requireUser(req, checkCSRF = true) {
 }
 
 // Логин пользователя
-export function loginUser(res, user) {
+export function loginUser(req, res, user) {
     const token = crypto.randomUUID();
     const csrf = crypto.randomUUID();
     sessions.set(token, {
         id: user.id,
         csrf: csrf,
+        ip: req.socket.remoteAddress,
         expires: Date.now() + config.server.sessionTime
     });
 

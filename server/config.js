@@ -8,7 +8,8 @@ export const config = {
         },
         usersFile: "./users.json", // users db
         drivePath: "./storage/", // Диск
-        registerOn: 1, // Включена ли регистрация (если false то /register GET/POST не будут обрабатываться)
+        registerOn: true, // Включена ли регистрация (если false то /register GET/POST не будут обрабатываться)
+        checkIP: true, // Проверять ли IP пользователя с IP в сессии
         minLengthLogin: 4,
         minLengthPassword: 6,
         hashPassword: {

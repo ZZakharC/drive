@@ -36,7 +36,7 @@ export async function app(req, res) {
                 const user = await findUser(data.login);
 
                 if (user && user.hashPassword === hashPassword(data.password, user.salt).hash)
-                    loginUser(res, user);
+                    loginUser(req, res, user);
                 else {
                     res.writeHead(401, { "Content-Type": "application/json" });
                     res.end(JSON.stringify({ ok: false }));
@@ -64,7 +64,7 @@ export async function app(req, res) {
                     res.writeHead(409);
                     res.end();
                 } else
-                    loginUser(res, user);
+                    loginUser(req, res, user);
             }
         }
 
