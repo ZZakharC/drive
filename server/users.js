@@ -50,8 +50,19 @@ export function loginUser(req, res, user) {
         expires: Date.now() + config.server.sessionTime
     });
 
-    res.setHeader("Set-Cookie", `token=${token}; Secure; HttpOnly; SameSite=Strict; Path=/`);
+    res.setHeader("Set-Cookie", `token=${token}; Secure; HttpOnly; SameSite=Strict; Max-Age=${config.server.sessionTime/1000}; Path=/`);
     res.setHeader("X-CSRF-Token", csrf);
+    res.statusCode = 200;
+
+    res.end(JSON.stringify({ ok: true }));
+}
+
+// Удаления сессии (Разлогин пользователя)
+export function logoutUser(req, res, token) {
+    sessions.delete(token)
+
+    res.setHeader("Set-Cookie", `token=; Secure; HttpOnly; SameSite=Strict; Max-Age=0; Path=/`);
+    res.setHeader("X-CSRF-Token", "");
     res.statusCode = 200;
 
     res.end(JSON.stringify({ ok: true }));

@@ -1,7 +1,7 @@
 import { config } from "./config.js";
 import { deleteFile, downloadFile, createDir, listFiles, loadFile } from "./drive.js";
 import { serveFile, getBody, hashPassword, rateLimiter, validateLogin, validatePassword } from "./tools.js";
-import { findUser, requireUser, loginUser, getUsers, deleteUser, createUser, changeUsers } from "./users.js";
+import { findUser, requireUser, loginUser, getUsers, deleteUser, createUser, changeUsers, logoutUser } from "./users.js";
 
 function notFound(res) {
     res.writeHead(404);
@@ -286,8 +286,18 @@ export async function app(req, res) {
     // -------- DELETE ---------
 
     else if (method === "DELETE") {
+        if (pathname === "/auth/me") {
+            const rep = await requireUser(req);
+
+            if (!rep.ok) {
+                res.writeHead(rep.error);
+                res.end();
+            } else
+                logoutUser(req, res, rep.token);       
+        }    
+        
         // Удаления пользователя по id
-        if (pathname.startsWith("/admin/users/")) {
+        else if (pathname.startsWith("/admin/users/")) {
             const rep = await requireUser(req);
             const userId = Number(pathname.replace("/admin/users/", ""));
 
