@@ -211,7 +211,7 @@ export async function app(req, res) {
                 res.writeHead(403);
                 res.end();
             } else {
-                let users = (await getUsers()).map(({ password, ...rest }) => rest);
+                let users = (await getUsers()).map(({ login, rules, id }) => ({ login, rules, id }));
 
                 res.writeHead(200, { "Content-Type": "application/json" });
                 res.end(JSON.stringify({ users }));
