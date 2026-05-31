@@ -82,13 +82,33 @@ export async function loadFile(req, res, pathFile) {
                     const headers = part.slice(0, headerEnd).toString("utf8");
                     const data = part.slice(headerEnd + 4, part.length - 2); // -2 убирает \r\n
 
-                    if (headers.includes("filename=")) {
-                        const filenameMatch = headers.match(/filename="(.+?)"/);
-                        if (!filenameMatch) continue;
+                    if (headers.includes("filename=") || headers.includes("filename*=")) {
 
-                        const originalName = path.basename(filenameMatch[1]);
+                        let originalName;
 
-                        const fullPath = getSafePath(path.join(pathFile || "", originalName));
+                        // 1) RFC 5987: filename*=UTF-8''encoded
+                        const filenameStarMatch = headers.match(/filename\*\s*=\s*([^']*)''([^;\r\n]+)/i);
+                        if (filenameStarMatch) {
+                            try {
+                                originalName = decodeURIComponent(filenameStarMatch[2]);
+                            } catch {
+                                originalName = filenameStarMatch[2];
+                            }
+                        }
+
+                        // 2) обычный filename="..."
+                        if (!originalName) {
+                            const filenameMatch = headers.match(/filename\s*=\s*"([^"]+)"/i);
+                            if (filenameMatch) {
+                                originalName = filenameMatch[1];
+                            }
+                        }
+
+                        if (!originalName) continue;
+
+                        const safeName = path.basename(originalName);
+
+                        const fullPath = getSafePath(path.join(pathFile || "", safeName));
                         if (!fullPath.ok) {
                             res.writeHead(fullPath.error);
                             return res.end();
