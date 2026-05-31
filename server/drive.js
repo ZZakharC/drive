@@ -51,7 +51,7 @@ export async function loadFile(req, res, pathFile) {
 
             if (totalSize > config.server.maxFileSize) {
                 req.destroy(); // останавливаем поток
-                
+
                 res.writeHead(413);
                 res.end();
                 return;
@@ -94,7 +94,12 @@ export async function loadFile(req, res, pathFile) {
                             return res.end();
                         }
 
-                        await fs.writeFile(fullPath.data, data);
+                        try {
+                            await fs.writeFile(fullPath.data, data);
+                        } catch (err) {
+                            console.error(err);
+                            return;
+                        }
 
                         res.writeHead(200, { "Content-Type": "application/json" });
                         return res.end(JSON.stringify({
