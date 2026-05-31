@@ -1,6 +1,6 @@
 import { config } from "./config.js";
 
-export let csrfToken = null;
+let csrfToken = null;
 
 export const server = {
     /* ----------------------- Auth ------------------------- */
