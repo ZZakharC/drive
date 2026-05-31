@@ -132,6 +132,7 @@ button:active, button.red:active {
   color: var(--color-act);
   font-size: 18px;
   justify-self: end;
+  cursor: pointer;
 }
 .top-bar .rules {
   justify-self: center;
@@ -162,9 +163,13 @@ button:active, button.red:active {
 }
 .main-bar.drag::before {
   --angle: 0deg;
+  --inset: 10px;
   content: "";
-  position: absolute;
-  inset: 10px;
+  position: fixed;
+  top: calc(var(--top-bar-height) + var(--inset));
+  bottom: calc(var(--bottom-bar-height) + var(--inset));
+  left: var(--inset);
+  right: var(--inset);
   z-index: 1000;
   padding: 10px;
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
@@ -175,9 +180,13 @@ button:active, button.red:active {
   background: conic-gradient(from var(--angle), transparent 0%, var(--color-act) 20%, transparent 40%, var(--color-act) 60%, transparent 80%, var(--color-act) 100%);
 }
 .main-bar.drag::after {
+  --inset: 20px;
   content: "Загрузить файл на сервер";
-  position: absolute;
-  inset: 20px;
+  position: fixed;
+  top: calc(var(--top-bar-height) + var(--inset));
+  bottom: calc(var(--bottom-bar-height) + var(--inset));
+  left: var(--inset);
+  right: var(--inset);
   background: var(--color-shadow-bar);
   display: flex;
   justify-content: center;

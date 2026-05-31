@@ -1,9 +1,9 @@
 import { config } from "/js/config.js";
+import { server } from "/js/server.js";
 
 /* -------------------- User session -------------------- */
 
 let user = null;
-let csrfToken = null;
 
 const usrRulesSpn = document.getElementById("rules_spn");
 const usrNameSpn = document.getElementById("name_spn");
@@ -11,28 +11,22 @@ const adminPanelSpn = document.getElementById("admin_panel_btn");
 const previewDeleteBtn = document.getElementById("preview_delete_btn");
 const newMenuOpenBtn = document.getElementById("new_menu_open_btn");
 
-// Парсинг
-try {
-    let response = await fetch(config.server.url + "auth/me", { "method": "GET" });
-    csrfToken = response.headers.get("x-csrf-token");
-    const data = await response.json();
-
-    user = data.user;
-} catch (error) {
-    user = null;
-    alert("Error: " + error);
-}
-
 // Заполнения данных о пользователе
-(() => {
-    if (!user)
+(async () => {
+    const res = await server.authUser();
+
+    if (!res)
         alert("Error: auth");
     else {
+        // Устанавливаем user
+        user = res.user;
+
         // Делаем кнопку удаления файла активной 
         if (user.rules & config.rule.CHANGE) {
             previewDeleteBtn.classList.remove("disable");
             newMenuOpenBtn.classList.remove("disable");
         }
+
         // админ панель
         if (user.rules & config.rule.ADMIN)
             adminPanelSpn.classList.remove("off");
@@ -43,6 +37,7 @@ try {
             .join("");
 
         usrNameSpn.textContent = user.name;
+        usrNameSpn.addEventListener("click", () => { if (confirm(`Выйти из аккаунта ${user.name}?`)) server.logoutUser() });
         usrRulesSpn.textContent = rules;
     }
 })();
@@ -101,90 +96,6 @@ const bottomSizeSpn = document.getElementById("file_size_spn");
 const bottomDateSpn = document.getElementById("file_data_spn");
 
 /* --------------------- Server API --------------------- */
-
-// Отправка файла на сервер 
-function uploadFile(file, onProgress) {
-    return new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-
-        activeUploads.add(xhr);
-
-        xhr.open("POST", config.server.url + "drive" + path);
-        xhr.setRequestHeader("x-csrf-token", csrfToken);
-        xhr.upload.onprogress = (event) => {
-            if (event.lengthComputable) {
-                const percent = (event.loaded / event.total) * 100;
-
-                onProgress?.({
-                    loaded: event.loaded,
-                    total: event.total,
-                    percent: percent.toFixed(2)
-                });
-            }
-        };
-
-        xhr.onload = () => {
-            activeUploads.delete(xhr);
-            if (xhr.status !== 200) {
-                alert("Error: " + xhr.status);
-
-                try {
-                    reject(JSON.parse(xhr.responseText));
-                } catch {
-                    reject(null);
-                }
-            } else
-                resolve(xhr.status);
-        };
-
-        xhr.onerror = () => {
-            activeUploads.delete(xhr);
-            alert("Error: Network");
-            reject("Network error");
-        }
-
-        const formData = new FormData();
-        formData.append("file", file);
-        xhr.send(formData);
-    });
-}
-
-// Скачивания файла
-function downloadFile(url) {
-    window.location.href = config.server.url + "drive" + url;
-}
-
-// Создания директории
-async function createDir(url) {
-    let res = await fetch(config.server.url + "drive" + url, {
-        method: "PUT",
-        headers: {
-            "x-csrf-token": csrfToken
-        }
-    });
-
-    if (res.ok)
-        return true;
-
-    alert("Error: " + res.status);
-    return false;
-}
-
-// Удаления файла с сервера
-async function deleteFile(url) {
-    let res = await fetch(config.server.url + "drive" + url, {
-        method: "DELETE",
-        headers: {
-            "x-csrf-token": csrfToken
-        }
-    });
-
-    if (res.ok)
-        return true;
-
-    alert("Error: " + res.status);
-    return false;
-}
 
 // Отмена всех загрузок на сервер
 function cancelAllUploads() {
@@ -317,25 +228,10 @@ function renderFiles(files) {
 /* -------------------- Load & Render ------------------- */
 
 (async () => {
-    const res = await fetch(config.server.url + "drive", {
-        method: "GET",
-        headers: {
-            "x-csrf-token": csrfToken
-        }
-    });
-
-    try {
-        let body = await res.json();
-
-        if (res.ok === false)
-            document.body.innerText = res.status;
-        else {
-            rootDir = realDir = body.files;
-            renderFiles(rootDir);
-        }
-    } catch (error) {
-        console.error(error);
-        alert("Error: Server error");
+    const res = await server.listFiles();
+    if (res) {
+        rootDir = realDir = res;
+        renderFiles(rootDir);
     }
 })();
 
@@ -411,7 +307,7 @@ mainContainer.addEventListener('drop', async (e) => {
     if (dt && dt.files && dt.files.length > 0) {
         for (const file of dt.files) {
             const prog = downloadListAdd(file.name);
-            let res = await uploadFile(file, (p) => {
+            let res = await server.uploadFile(activeUploads, path, file, (p) => {
                 downloadListUpdate(p, prog.progress, prog.percent);
             });
 
@@ -449,14 +345,14 @@ previewDiv.addEventListener("contextmenu", previewClose);
 
 // Скачать файл
 previewDownloadBtn.addEventListener("click", async () => {
-    downloadFile(previewDownloadBtn.url);
+    server.downloadFile(previewDownloadBtn.url);
 });
 
 // Удалить файл
 previewDeleteBtn.addEventListener("click", async () => {
     if (!confirm(`Удалить файл ${previewDeleteBtn.url}?`)) return;
 
-    const res = await deleteFile(previewDeleteBtn.url);
+    const res = await server.deleteFile(previewDeleteBtn.url);
     if (res) {
         const index = realDir.findIndex(item => item.url === previewDeleteBtn.url);
         if (index !== -1) realDir.splice(index, 1);
@@ -512,13 +408,13 @@ function fileMenuOpen(e, file_block, file) {
     }
 
     fileMenuDownloadBtn.onclick = () => {
-        downloadFile(file.url);
+        server.downloadFile(file.url);
         mainContainer.classList.remove("file-menu");
     };
 
     fileMenuDeleteBtn.onclick = async () => {
         if (!confirm(`Удалить ${file.url}?`)) return;
-        const res = await deleteFile(file.url);
+        const res = await server.deleteFile(file.url);
         if (res) {
             const index = realDir.findIndex(item => item.url === file.url);
             if (index !== -1) realDir.splice(index, 1);
@@ -584,7 +480,7 @@ newMenuUploadFileInp.addEventListener('change', async () => {
     if (!file) return; // пользователь нажал «Отмена»
 
     const prog = downloadListAdd(file.name);
-    let res = await uploadFile(file, (p) => {
+    let res = await server.uploadFile(activeUploads, path, file, (p) => {
         downloadListUpdate(p, prog.progress, prog.percent);
     });
 
@@ -637,7 +533,7 @@ createDirBtn.addEventListener("click", async () => {
             createDirInp.classList.remove("red");
         }, 750);
     } else {
-        let res = await createDir(path + name);
+        let res = await server.createDir(path + name);
         if (res && !realDir.find(f => f.name === name)) {
             realDir.push({
                 name: name,

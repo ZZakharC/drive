@@ -1,4 +1,5 @@
 import { config } from "/js/config.js";
+import { server } from "/js/server.js";
 
 const login_inp = document.getElementById("login_inp");
 const password_inp = document.getElementById("password_inp");
@@ -14,13 +15,11 @@ const loginRegex = /^[a-zA-Z0-9._-]{4,50}$/;
 const passwordRegex = /^[\x20-\x7E]{6,100}$/;
 
 function validateCredentials(login, password) {
-    if (!loginRegex.test(login)) {
+    if (!loginRegex.test(login))
         return "Некорректный логин";
-    }
 
-    if (!passwordRegex.test(password)) {
+    if (!passwordRegex.test(password))
         return "Некорректный пароль";
-    }
 
     return null;
 }
@@ -38,17 +37,6 @@ if (password2_inp) {
                 ? "Пароли не совпадают"
                 : "";
     });
-}
-
-// Общая функция отправки
-async function sendAuth(url, body) {
-    let response = await fetch(config.server.url + url, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(body)
-    });
-
-    return response;
 }
 
 // Регистрация
@@ -77,16 +65,13 @@ if (register_btn) {
 
         text_spn.textContent = "";
 
-        let response = await sendAuth("auth/register", {
-            login: login_inp.value,
-            password: password_inp.value
-        });
+        let res = await server.registerUser(login_inp.value, password_inp.value);
 
-        if (response.ok)
+        if (res)
             location.href = "/";
-        else if (response.status === 409)
+        else if (res === 409)
             text_spn.textContent = "Пользователь уже существует";
-        else if (response.status === 429)
+        else if (res === 429)
             text_spn.textContent = "Слишком много попыток, попробуйте позже";
         else
             text_spn.textContent = "Неизвестная ошибка";
@@ -114,16 +99,13 @@ if (login_btn) {
 
         text_spn.textContent = "";
 
-        let response = await sendAuth("auth/login", {
-            login: login_inp.value,
-            password: password_inp.value
-        });
+        let res = await server.loginUser(login_inp.value, password_inp.value);
 
-        if (response.ok)
+        if (res)
             location.href = "/";
-        else if (response.status === 401)
+        else if (res === 401)
             text_spn.textContent = "Неверный логин или пароль";
-        else if (response.status === 429)
+        else if (res === 429)
             text_spn.textContent = "Слишком много попыток, попробуйте позже";
         else
             text_spn.textContent = "Неизвестная ошибка";

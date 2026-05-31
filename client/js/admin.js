@@ -1,28 +1,25 @@
 import { config } from "/js/config.js";
+import { server } from "/js/server.js";
 
 /* -------------------- User session -------------------- */
 
 let user = null;
 let csrfToken = null;
-const usrName = document.getElementById("name_spn");
+const usrNameSpn = document.getElementById("name_spn");
 
-// Парсинг
-try {
-    let response = await fetch(config.server.url + "auth/me", { "method": "GET" });
-    csrfToken = response.headers.get("x-csrf-token");
-    const data = await response.json();
+// Заполнения данных о пользователе
+(async () => {
+    const res = await server.authUser();
 
-    user = data.user;
-} catch {
-    user = null;
-}
+    if (!res)
+        alert("Error: auth");
+    else {
+        // Устанавливаем user
+        user = res.user;
 
-// Заполнения прав и имени
-(() => {
-    if (!user)
-        alert("Error: User not found in sessionStorage");
-    else
-        usrName.textContent = user.name;
+        usrNameSpn.textContent = user.name;
+        usrNameSpn.addEventListener("click", () => { if (confirm(`Выйти из аккаунта ${user.name}?`)) server.logoutUser() });
+    }
 })();
 
 /* -------------------- Users view -------------------- */
@@ -34,17 +31,8 @@ const uContainer = document.getElementById("users_container");
 async function deleteUser(user, user_block) {
     if (!confirm(`Удалить пользователя ${user.login}?`)) return;
 
-    let res = await fetch(config.server.url + "admin/users/" + user.id, {
-        method: "DELETE",
-        headers: {
-            "x-csrf-token": csrfToken
-        },
-    });
-
-    if (res.ok)
+    if (await server.deleteUser(user.id))
         user_block.remove();
-    else
-        alert("Error: " + res.status);
 }
 
 // Render users
@@ -132,18 +120,6 @@ applyBtn.onclick = async () => {
         rules
     }));
 
-    let response = await fetch(config.server.url + "admin/users", {
-        "method": "POST",
-        headers: {
-            "x-csrf-token": csrfToken
-        },
-        "body": JSON.stringify({
-            users
-        })
-    });
-
-    if (!response.ok)
-        alert("Error: " + response.status);
-    else
+    if (await server.changeUsers(users))
         applyBtn.classList.add("off");
 }
