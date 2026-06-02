@@ -13,7 +13,7 @@ export async function app(req, res) {
     const parsedUrl = new URL(url, `http://${req.headers.host}`);
     const pathname = decodeURIComponent(parsedUrl.pathname);
 
-    console.log(`${method} ${pathname}`);
+    console.log(`${req.socket.remoteAddress}\t${method}\t${pathname}`);
 
     // --------- POST ----------
 
@@ -106,7 +106,6 @@ export async function app(req, res) {
             const rep = await requireUser(req);
 
             if (!rep.ok) {
-                console.log(rep);
                 res.writeHead(rep.error);
                 res.end();
             } else if (!(rep.user.rules & 2)) {
@@ -130,7 +129,6 @@ export async function app(req, res) {
             const rep = await requireUser(req);
 
             if (!rep.ok) {
-                console.log(rep);
                 res.writeHead(rep.error);
                 res.end();
             } else if (!(rep.user.rules & 2)) {
@@ -140,7 +138,11 @@ export async function app(req, res) {
                 const path = pathname.replace("/drive/", "");
                 const code = await createDir(path);
 
-                res.writeHead(code);
+                if (code.ok)
+                    res.writeHead(200);
+                else
+                    res.writeHead(code.error);
+
                 res.end();
             }
         }
@@ -167,24 +169,6 @@ export async function app(req, res) {
         }
 
         // Список файлов
-        else if (pathname === "/drive") {
-            const rep = await requireUser(req, false); // Не проверяем CSRF
-
-            if (!rep.ok) {
-                res.writeHead(rep.error);
-                res.end();
-            } else if (!(rep.user.rules & 1)) {
-                res.writeHead(403);
-                res.end();
-            } else {
-                const files = await listFiles(config.server.drivePath);
-
-                res.writeHead(200, { "Content-Type": "application/json" });
-                res.end(JSON.stringify({ files }));
-            }
-        }
-
-        // Доступ к файлам Drive
         else if (pathname.startsWith("/drive/")) {
             const rep = await requireUser(req, false); // Не проверяем CSRF
 
@@ -196,6 +180,30 @@ export async function app(req, res) {
                 res.end();
             } else {
                 const path = pathname.replace("/drive/", "");
+                const files = await listFiles(path);
+
+                if (files.ok) {
+                    res.writeHead(200, { "Content-Type": "application/json" });
+                    res.end(JSON.stringify({ files: files.data }));
+                } else {
+                    res.writeHead(files.error);
+                    res.end();
+                }
+            }
+        }
+
+        // Доступ к файлам Drive
+        else if (pathname.startsWith("/download/")) {
+            const rep = await requireUser(req, false); // Не проверяем CSRF
+
+            if (!rep.ok) {
+                res.writeHead(rep.error);
+                res.end();
+            } else if (!(rep.user.rules & 1)) {
+                res.writeHead(403);
+                res.end();
+            } else {
+                const path = pathname.replace("/download/", "");
                 downloadFile(res, path);
             }
         }
@@ -329,7 +337,11 @@ export async function app(req, res) {
                 const path = pathname.replace("/drive/", "");
                 const code = await deleteFile(path);
 
-                res.writeHead(code);
+                if (code.ok)
+                    res.writeHead(200);
+                else
+                    res.writeHead(code.error);
+
                 res.end();
             }
         }

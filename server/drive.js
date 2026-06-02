@@ -149,7 +149,7 @@ export async function downloadFile(res, pathFile) {
     const fullPath = getSafePath(pathFile);
 
     if (!fullPath.ok || !(await isFile(fullPath.data))) {
-        res.writeHead(404);
+        res.writeHead(403);
         res.end();
     } else {
         res.writeHead(200, {
@@ -166,29 +166,29 @@ export async function downloadFile(res, pathFile) {
 export async function createDir(pathDir) {
     const rep = getSafePath(pathDir);
     if (!rep.ok)
-        return 404;
+        return { ok: false, error: 403 };
 
     try {
         await fs.mkdir(rep.data, { recursive: true });
     } catch (error) {
         console.error(`Failed to create ${rep.data}:`, error);
-        return 500;
+        return { ok: false, error: 500 };
     }
 
-    return 200;
+    return { ok: true };
 }
 
 // Удаления файла или директории
 export async function deleteFile(pathFile) {
     const rep = getSafePath(pathFile);
     if (!rep.ok)
-        return 404;
+        return { ok: false, error: 403 };
 
     let stat = null;
     try {
         stat = await fs.stat(rep.data);
     } catch (error) {
-        return 404;
+        return { ok: false, error: 500 };
     }
 
     if (stat.isFile() || stat.isDirectory()) {
@@ -196,28 +196,35 @@ export async function deleteFile(pathFile) {
             await fs.rm(rep.data, { recursive: true, force: true });
         } catch (error) {
             console.error(`Failed to delete ${rep.data}:`, error);
-            return 500;
+            return { ok: false, error: 500 };
         }
     }
 
-    return 200;
+    return { ok: true };
 }
 
 // Получения списка файлов
-export async function listFiles(dirPath, url = "") {
-    const entries = await fs.readdir(dirPath, { withFileTypes: true });
+export async function listFiles(pathDir) {
+    const rep = getSafePath(pathDir);
+    if (!rep.ok)
+        return { ok: false, error: 403 };
+    if (await isFile(rep.data))
+        return { ok: false, error: 400 };
 
-    const children = await Promise.all(
+    const entries = await fs.readdir(rep.data, { withFileTypes: true });
+    let url = rep.data.replace(BASE_DIR, "");
+    if (!url.startsWith('/')) url = '/' + url;
+
+    const list = await Promise.all(
         entries.map(async (entry) => {
-            const fullPath = path.join(dirPath, entry.name);
+            const fullPath = path.join(rep.data, entry.name);
             const urlPath = path.join(url, entry.name).replace(/\\/g, "/");
 
             if (entry.isDirectory()) {
                 return {
                     name: entry.name,
                     type: "dir",
-                    url: `/${urlPath}`,
-                    children: await listFiles(fullPath, urlPath)
+                    url: `${urlPath}`
                 };
             }
 
@@ -228,10 +235,10 @@ export async function listFiles(dirPath, url = "") {
                 type: "file",
                 size: stats.size,
                 date: stats.birthtime.toISOString().split("T")[0],
-                url: `/${urlPath}`
+                url: `${urlPath}`
             };
         })
     );
 
-    return children;
+    return { ok: true, data: list };
 }

@@ -113,9 +113,9 @@ export const server = {
     /* ----------------------- Drive ------------------------ */
 
     // Получения списка всех файлов
-    listFiles: async () => {
+    listFiles: async (url) => {
         try {
-            const res = await fetch(config.server.url + "drive", {
+            const res = await fetch(config.server.url + "drive" + url, {
                 method: "GET",
                 headers: {
                     "x-csrf-token": csrfToken
@@ -127,7 +127,7 @@ export const server = {
             else
                 return null;
         } catch (error) {
-                return null;
+            return null;
         }
     },
 
@@ -180,7 +180,7 @@ export const server = {
 
     // Скачивания файла
     downloadFile: (url) => {
-        window.location.href = config.server.url + "drive" + url;
+        window.location.href = config.server.url + "download" + url;
     },
 
     // Создания директории

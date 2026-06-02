@@ -11,7 +11,7 @@ const adminPanelSpn = document.getElementById("admin_panel_btn");
 const previewDeleteBtn = document.getElementById("preview_delete_btn");
 const newMenuOpenBtn = document.getElementById("new_menu_open_btn");
 
-// Заполнения данных о пользователе
+// Заполнения данных о пользователе и рендер файлов
 (async () => {
     const res = await server.authUser();
 
@@ -20,6 +20,9 @@ const newMenuOpenBtn = document.getElementById("new_menu_open_btn");
     else {
         // Устанавливаем user
         user = res.user;
+
+        // Рендер файлов
+        renderFiles();
 
         // Делаем кнопку удаления файла активной 
         if (user.rules & config.rule.CHANGE) {
@@ -45,8 +48,6 @@ const newMenuOpenBtn = document.getElementById("new_menu_open_btn");
 /* ----------------------- Drive ------------------------ */
 
 let path = "/";
-let rootDir = null;
-let realDir = null;
 const activeUploads = new Set();
 
 // Контейнеры
@@ -163,8 +164,7 @@ function renderFile(file) {
             upDirBtn.classList.remove("off");
             file_block.dispatchEvent(new Event("mouseleave")); // Вызываем эвент 
 
-            realDir = file.children;
-            renderFiles(file.children);
+            renderFiles();
         });
     }
     // Event файла
@@ -206,34 +206,29 @@ function renderFile(file) {
 }
 
 // Отобразить файлы
-function renderFiles(files) {
-    // Сортировка сначала директории потом файлы
-    files.sort((a, b) => {
-        // 1. папки выше файлов
-        if (a.type === "dir" && b.type !== "dir") return -1;
-        if (a.type !== "dir" && b.type === "dir") return 1;
+async function renderFiles() {
+    const files = await server.listFiles(path);
 
-        // 2. внутри группы — по алфавиту
-        return a.name.localeCompare(b.name, "ru", {
-            sensitivity: "base"
+    if (files) {
+        // Сортировка сначала директории потом файлы
+        files.sort((a, b) => {
+            // 1. папки выше файлов
+            if (a.type === "dir" && b.type !== "dir") return -1;
+            if (a.type !== "dir" && b.type === "dir") return 1;
+
+            // 2. внутри группы — по алфавиту
+            return a.name.localeCompare(b.name, "ru", {
+                sensitivity: "base"
+            });
         });
-    });
 
-    fContainer.innerText = "";
-    files.forEach(file => {
-        renderFile(file);
-    });
+        fContainer.innerText = "";
+        files.forEach(file => {
+            renderFile(file);
+        });
+    } else
+        alert("ERROR");
 }
-
-/* -------------------- Load & Render ------------------- */
-
-(async () => {
-    const res = await server.listFiles();
-    if (res) {
-        rootDir = realDir = res;
-        renderFiles(rootDir);
-    }
-})();
 
 /* ------------------------ Path ------------------------ */
 
@@ -254,16 +249,7 @@ upDirBtn.addEventListener("click", () => {
         upDirBtn.classList.add("off");
 
     // перерисовка
-    let dir = rootDir;
-
-    for (const part of parts) {
-        const downDir = dir.find(f => f.name === part && f.type === "dir");
-        if (!downDir) return;
-
-        dir = downDir.children;
-    }
-
-    renderFiles(dir);
+    renderFiles();
 });
 
 /* ---------- Drag & Drop Event (file upload) ----------- */
@@ -310,22 +296,9 @@ mainContainer.addEventListener('drop', async (e) => {
             let res = await server.uploadFile(activeUploads, path, file, (p) => {
                 downloadListUpdate(p, prog.progress, prog.percent);
             });
-
-            if (res) {
-                const index = realDir.findIndex(f => f.name === file.name);
-                if (index !== -1) realDir.splice(index, 1);
-
-                realDir.push({
-                    name: file.name,
-                    type: 'file',
-                    size: file.size,
-                    date: dateString(file.lastModified),
-                    url: path + file.name
-                });
-            }
         }
 
-        renderFiles(realDir);
+        renderFiles();
     }
 
     mainContainer.classList.remove("file-preview");
@@ -353,13 +326,8 @@ previewDeleteBtn.addEventListener("click", async () => {
     if (!confirm(`Удалить файл ${previewDeleteBtn.url}?`)) return;
 
     const res = await server.deleteFile(previewDeleteBtn.url);
-    if (res) {
-        const index = realDir.findIndex(item => item.url === previewDeleteBtn.url);
-        if (index !== -1) realDir.splice(index, 1);
-
-        mainContainer.classList.remove("file-preview");
-        renderFiles(realDir);
-    }
+    if (res)
+        renderFiles();
 });
 
 /* ---------------------- File menu --------------------- */
@@ -415,13 +383,9 @@ function fileMenuOpen(e, file_block, file) {
     fileMenuDeleteBtn.onclick = async () => {
         if (!confirm(`Удалить ${file.url}?`)) return;
         const res = await server.deleteFile(file.url);
-        if (res) {
-            const index = realDir.findIndex(item => item.url === file.url);
-            if (index !== -1) realDir.splice(index, 1);
+        if (res)
+            renderFiles();
 
-            mainContainer.classList.remove("file-preview");
-            renderFiles(realDir);
-        }
         mainContainer.classList.remove("file-menu");
     };
 }
@@ -484,20 +448,8 @@ newMenuUploadFileInp.addEventListener('change', async () => {
         downloadListUpdate(p, prog.progress, prog.percent);
     });
 
-    if (res) {
-        const index = realDir.findIndex(f => f.name === file.name);
-        if (index !== -1) realDir.splice(index, 1);
-
-        realDir.push({
-            name: file.name,
-            type: "file",
-            size: file.size,
-            date: dateString(file.lastModified),
-            url: path + file.name
-        });
-
-        renderFiles(realDir);
-    }
+    if (res)
+        renderFiles();
 
     newMenuUploadFileInp.value = '';
 });
@@ -534,18 +486,8 @@ createDirBtn.addEventListener("click", async () => {
         }, 750);
     } else {
         let res = await server.createDir(path + name);
-        if (res && !realDir.find(f => f.name === name)) {
-            realDir.push({
-                name: name,
-                type: "dir",
-                size: null,
-                date: null,
-                children: [],
-                url: path + name
-            });
-
-            renderFiles(realDir);
-        }
+        if (res)
+            renderFiles();
 
         mainContainer.classList.remove("create-dir");
         createDirInp.value = '';
