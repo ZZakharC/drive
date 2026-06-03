@@ -7,6 +7,8 @@
 A local web application for file storage and management with user support, access control, and an administrative panel.
 The backend is implemented in **pure** Node.js (no frameworks), while the frontend uses vanilla JavaScript + SCSS.
 
+[Repository with Android client](https://github.com/ZZakharC/drive-android)
+
 ---
 
 ## 🚀 Features
