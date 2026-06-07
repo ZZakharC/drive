@@ -356,7 +356,26 @@ button {
         }
 
         img {
-            width: min(30vh, 250px);
+            max-width: 35vw;
+            max-height: 35vh;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+
+            &.image {
+                max-width: 45vw;
+                max-height: 45vh;
+                transition: 0.5s ease;
+                will-change: transform;
+                cursor: zoom-in;
+
+                &.zoom {
+                    position: fixed;
+                    transform: scale(2.2);
+                    cursor: zoom-out;
+                    z-index: 1000;
+                }
+            }
         }
 
         .info {

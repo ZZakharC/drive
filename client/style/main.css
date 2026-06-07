@@ -299,7 +299,25 @@ button:active, button.red:active {
   padding: 10px;
 }
 .main-bar .file-preview img {
-  width: min(30vh, 250px);
+  max-width: 35vw;
+  max-height: 35vh;
+  width: auto;
+  height: auto;
+  -o-object-fit: contain;
+     object-fit: contain;
+}
+.main-bar .file-preview img.image {
+  max-width: 45vw;
+  max-height: 45vh;
+  transition: 0.5s ease;
+  will-change: transform;
+  cursor: zoom-in;
+}
+.main-bar .file-preview img.image.zoom {
+  position: fixed;
+  transform: scale(2.2);
+  cursor: zoom-out;
+  z-index: 1000;
 }
 .main-bar .file-preview .info {
   display: flex;

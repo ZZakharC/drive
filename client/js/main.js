@@ -171,7 +171,10 @@ function renderFile(file) {
     else {
         file_block.addEventListener("dblclick", () => {
             previewNameSpn.textContent = file.name;
-            previewImg.src = img.src;
+
+            // Настройка изображения
+            previewImage(file, ext, img.src);
+
             previewPathSpn.textContent = file.url;
             previewSizeSpn.textContent = (size.textContent || "неизвестно");
             previewDateSpn.textContent = (file.date || "неизвестно");
@@ -329,6 +332,27 @@ previewDeleteBtn.addEventListener("click", async () => {
     if (res)
         renderFiles();
 });
+
+
+// Настройка изображения
+function previewImage(file, type, defaultSrc) {
+    if (!config.imagesRender.includes(type) || file.size > config.maxImageRenderSize)
+        previewImg.src = defaultSrc;
+    else {
+        previewImg.src = server.downloadFileUrl(file.url);
+        previewImg.classList.remove("zoom");
+        previewImg.classList.add("image");
+
+        previewImg.onerror = () => {
+            previewImg.onerror = null; // Защита от зацикливания
+            previewImg.src = defaultSrc;   
+            previewImg.classList.remove("image");
+        };
+    }
+}
+
+// Нажатие на изображения
+previewImg.addEventListener("click", () => { previewImg.classList.toggle("zoom"); });
 
 /* ---------------------- File menu --------------------- */
 

@@ -178,9 +178,14 @@ export const server = {
         });
     },
 
+    // Получение url для скачивания фала
+    downloadFileUrl: (url) => {
+        return config.server.url + "download" + url;
+    },
+
     // Скачивания файла
     downloadFile: (url) => {
-        window.location.href = config.server.url + "download" + url;
+        window.location.href = server.downloadFileUrl(url);
     },
 
     // Создания директории

@@ -4,6 +4,8 @@ export const config = {
     },
     minLengthLogin: 4,
     minLengthPassword: 6,
+    imagesRender: ["png", "jpeg", "jpg", "icon", "svg"], // Типы файлов которые будут отображаться
+    maxImageRenderSize: 20971520, // 20 MB
     rule: {
         READ: 1,
         CHANGE: 2,
