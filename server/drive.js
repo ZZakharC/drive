@@ -211,7 +211,14 @@ export async function listFiles(pathDir) {
     if (await isFile(rep.data))
         return { ok: false, error: 400 };
 
-    const entries = await fs.readdir(rep.data, { withFileTypes: true });
+    let entries = null;
+
+    try {
+        entries = await fs.readdir(rep.data, { withFileTypes: true });
+    } catch (error) {
+        return { ok: false, error: 404 };
+    }
+
     let url = rep.data.replace(BASE_DIR, "");
     if (!url.startsWith('/')) url = '/' + url;
 
