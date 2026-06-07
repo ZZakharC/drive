@@ -11,9 +11,14 @@ const adminPanelSpn = document.getElementById("admin_panel_btn");
 const previewDeleteBtn = document.getElementById("preview_delete_btn");
 const newMenuOpenBtn = document.getElementById("new_menu_open_btn");
 
+// Старт скрипта
 // Заполнения данных о пользователе и рендер файлов
 (async () => {
     const res = await server.authUser();
+    const pth = new URLSearchParams(window.location.search).get("path");
+
+    if (pth)
+        path = pth;
 
     if (!res)
         alert("Error: auth");
@@ -23,6 +28,12 @@ const newMenuOpenBtn = document.getElementById("new_menu_open_btn");
 
         // Рендер файлов
         renderFiles();
+
+        // Если не в корневой папке отображаем кнопку и обновляем spn
+        if (path != "/") {
+            upDirBtn.classList.remove("off");
+            pathSpn.textContent = path;
+        }
 
         // Делаем кнопку удаления файла активной 
         if (user.rules & config.rule.CHANGE) {
@@ -164,6 +175,8 @@ function renderFile(file) {
             upDirBtn.classList.remove("off");
             file_block.dispatchEvent(new Event("mouseleave")); // Вызываем эвент 
 
+            history.replaceState({}, "", `?path=${file.url}`);
+
             renderFiles();
         });
     }
@@ -229,8 +242,10 @@ async function renderFiles() {
         files.forEach(file => {
             renderFile(file);
         });
-    } else
+    } else {
+        history.replaceState({}, "", "?path=/");
         alert("ERROR");
+    }
 }
 
 /* ------------------------ Path ------------------------ */
@@ -246,6 +261,8 @@ upDirBtn.addEventListener("click", () => {
     path = "/" + parts.join("/");
 
     pathSpn.textContent = path;
+
+    history.replaceState({}, "", `?path=${path}`);
 
     // Выключаем кнопку если мы в корне /
     if (path === "/")
@@ -345,7 +362,7 @@ function previewImage(file, type, defaultSrc) {
 
         previewImg.onerror = () => {
             previewImg.onerror = null; // Защита от зацикливания
-            previewImg.src = defaultSrc;   
+            previewImg.src = defaultSrc;
             previewImg.classList.remove("image");
         };
     }
