@@ -353,11 +353,12 @@ previewDeleteBtn.addEventListener("click", async () => {
 
 // Настройка изображения
 function previewImage(file, type, defaultSrc) {
+    previewImg.className = "";
+
     if (!config.imagesRender.includes(type) || file.size > config.maxImageRenderSize)
         previewImg.src = defaultSrc;
     else {
         previewImg.src = server.downloadFileUrl(file.url);
-        previewImg.classList.remove("zoom");
         previewImg.classList.add("image");
 
         previewImg.onerror = () => {
