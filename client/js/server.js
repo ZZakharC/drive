@@ -35,10 +35,7 @@ export const server = {
             })
         });
 
-        if (res.ok)
-            return true;
-        else
-            return res.status;
+        return { ok: res.ok, code: res.status };
     },
 
     // Логин пользователя
@@ -52,10 +49,7 @@ export const server = {
             })
         });
 
-        if (res.ok)
-            return true;
-        else
-            return res.status;
+        return { ok: res.ok, code: res.status };
     },
 
     // Разлогин пользователя

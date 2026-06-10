@@ -67,14 +67,14 @@ if (register_btn) {
 
         let res = await server.registerUser(login_inp.value, password_inp.value);
 
-        if (res)
+        if (res.ok)
             location.href = "/";
-        else if (res === 409)
+        else if (res.code === 409)
             text_spn.textContent = "Пользователь уже существует";
-        else if (res === 429)
+        else if (res.code === 429)
             text_spn.textContent = "Слишком много попыток, попробуйте позже";
         else
-            text_spn.textContent = "Неизвестная ошибка";
+            text_spn.textContent = "Неизвестная ошибка: " + res.code;
     };
 }
 
@@ -101,13 +101,13 @@ if (login_btn) {
 
         let res = await server.loginUser(login_inp.value, password_inp.value);
 
-        if (res)
+        if (res.ok)
             location.href = "/";
-        else if (res === 401)
+        else if (res.code === 401)
             text_spn.textContent = "Неверный логин или пароль";
-        else if (res === 429)
+        else if (res.code === 429)
             text_spn.textContent = "Слишком много попыток, попробуйте позже";
         else
-            text_spn.textContent = "Неизвестная ошибка";
+            text_spn.textContent = "Неизвестная ошибка: " + res.code;
     };
 }
