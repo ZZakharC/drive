@@ -79,8 +79,10 @@ const previewDeleteBtn = document.getElementById("preview_delete_btn");
 
 // Меню файла
 const fileMenuDiv = document.getElementById('file_menu_div');
-const fileMenuDownloadBtn = document.getElementById('file_menu_download_btn');
-const fileMenuDeleteBtn = document.getElementById('file_menu_delete_btn');
+const fileMenuDownloadDiv = document.getElementById('file_menu_download_div');
+const fileMenuDownloadSpn = document.getElementById('file_menu_download_spn');
+const fileMenuDeleteDiv = document.getElementById('file_menu_delete_div');
+const fileMenuDeleteSpn = document.getElementById('file_menu_delete_spn');
 
 // Меню добавления
 const newMenuOpenBtn = document.getElementById("new_menu_open_btn");
@@ -406,13 +408,13 @@ function fileMenuOpen(e, file_block, file) {
     // Настройка кнопок
 
     if (file.type === "dir") {
-        fileMenuDownloadBtn.classList.add("off");
-        fileMenuDownloadBtn.textContent = "Скачать папку";
-        fileMenuDeleteBtn.textContent = "Удалить папку";
+        fileMenuDownloadDiv.classList.add("off");
+        fileMenuDownloadSpn.textContent = "Скачать папку";
+        fileMenuDeleteSpn.textContent = "Удалить папку";
     } else {
-        fileMenuDownloadBtn.classList.remove("off");
-        fileMenuDownloadBtn.textContent = "Скачать файл";
-        fileMenuDeleteBtn.textContent = "Удалить файл";
+        fileMenuDownloadDiv.classList.remove("off");
+        fileMenuDownloadSpn.textContent = "Скачать файл";
+        fileMenuDeleteSpn.textContent = "Удалить файл";
     }
 
     fileMenuDownloadBtn.onclick = () => {

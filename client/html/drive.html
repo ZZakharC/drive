@@ -61,6 +61,8 @@
                 <input type="file" id="upload_file_inp" hidden>
             </div>
         </div>
+
+        <!-- New Menu Button -->
         <button title="Создать директорию или загрузить файл" class="new-menu-open-button disable"
             id="new_menu_open_btn">
             <svg viewBox="0 0 24 24" focusable="false">
@@ -71,31 +73,31 @@
         <!-- Create Dir -->
         <div class="create-dir" id="create_dir_div">
             <h2>Новая папка</h2>
-            <input type="text" id="create_dir_inp">
+            <input type="text" id="create_dir_inp" placeholder="Имя папки">
             <button id="create_dir_btn">Создать</button>
         </div>
 
         <!-- File Menu -->
         <div class="file-menu menu" id="file_menu_div">
-            <div class="option" id="file_menu_download_btn">
+            <div class="option" id="file_menu_download_div">
                 <svg viewBox="0 0 24 24">
                     <path
                         d="M4 15h2v3h12v-3h2v3c0 1.1-.9 2-2 2H6c-1.1 0-2-.9-2-2m11.59-8.41L13 12.17V4h-2v8.17L8.41 9.59 7 11l5 5 5-5-1.41-1.41z">
                     </path>
                 </svg>
-                <span>Скачать файл</span>
+                <span id="file_menu_download_spn">Скачать файл</span>
             </div>
 
             <div class="hr"></div>
 
-            <div class="option" id="file_menu_delete_btn">
+            <div class="option" id="file_menu_delete_div">
                 <svg viewBox="0 0 24 24">
                     <path d="M0 0h24v24H0V0z" fill="none"></path>
                     <path
                         d="M15 4V3H9v1H4v2h1v13c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V6h1V4h-5zm2 15H7V6h10v13zM9 8h2v9H9zm4 0h2v9h-2z">
                     </path>
                 </svg>
-                <span>Удалить файл</span>
+                <span id="file_menu_delete_spn">Удалить файл</span>
             </div>
         </div>
 
