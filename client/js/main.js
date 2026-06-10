@@ -417,12 +417,12 @@ function fileMenuOpen(e, file_block, file) {
         fileMenuDeleteSpn.textContent = "Удалить файл";
     }
 
-    fileMenuDownloadBtn.onclick = () => {
+    fileMenuDownloadDiv.onclick = () => {
         server.downloadFile(file.url);
         mainContainer.classList.remove("file-menu");
     };
 
-    fileMenuDeleteBtn.onclick = async () => {
+    fileMenuDeleteDiv.onclick = async () => {
         if (!confirm(`Удалить ${file.url}?`)) return;
         const res = await server.deleteFile(file.url);
         if (res)
