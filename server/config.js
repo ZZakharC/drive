@@ -20,7 +20,7 @@ export const config = {
         },
         maxFileSize: 10737418240, // 10 GB
         maxBodySize: 1_000_000, // 75.56 MB
-        sessionTime: 86_400_000, // 24 hours
+        sessionTime: 86_400_000, // 24 hours (в миллисекундах!)
         rateLimit: {
             maxAttempts: 5, // попыток в окне
             windowMs: 900_000, // 15 минут
