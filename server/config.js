@@ -1,6 +1,6 @@
 export const config = {
     server: {
-        port: 3000, // 80 чтобы сервер открывался на host по умолчанию
+        port: 3000, // 443 чтобы сервер открывался на host по умолчанию
         host: "localhost",
         https: {
             keyFilePath: "./server.key",
