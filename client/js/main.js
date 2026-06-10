@@ -8,8 +8,6 @@ let user = null;
 const usrRulesSpn = document.getElementById("rules_spn");
 const usrNameSpn = document.getElementById("name_spn");
 const adminPanelSpn = document.getElementById("admin_panel_btn");
-const previewDeleteBtn = document.getElementById("preview_delete_btn");
-const newMenuOpenBtn = document.getElementById("new_menu_open_btn");
 
 // Старт скрипта
 // Заполнения данных о пользователе и рендер файлов
@@ -77,7 +75,7 @@ const previewPathSpn = document.getElementById("preview_path_spn");
 const previewSizeSpn = document.getElementById("preview_size_spn");
 const previewDateSpn = document.getElementById("preview_date_spn");
 const previewDownloadBtn = document.getElementById("preview_download_btn");
-// const previewDeleteBtn = document.getElementById("preview_delete_btn"); Выше по коду в заполнении данных пользователя
+const previewDeleteBtn = document.getElementById("preview_delete_btn");
 
 // Меню файла
 const fileMenuDiv = document.getElementById('file_menu_div');
@@ -85,7 +83,7 @@ const fileMenuDownloadBtn = document.getElementById('file_menu_download_btn');
 const fileMenuDeleteBtn = document.getElementById('file_menu_delete_btn');
 
 // Меню добавления
-// const newMenuOpenBtn = document.getElementById("file_add_btn"); Выше по коду в заполнении данных пользователя
+const newMenuOpenBtn = document.getElementById("new_menu_open_btn");
 const newMenuDiv = document.getElementById('new_menu_div');
 const newMenuOpenCreateDirBtn = document.getElementById('new_menu_open_create_dir_btn');
 // Загрузка файлов
