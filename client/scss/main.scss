@@ -17,7 +17,7 @@
     --color-act: #b84dff;
     --color-red: #f20c0c;
     --color-green: #46f20c;
-    --color-act-dim: rgba(184, 77, 255, 0.85);
+    --color-act-dim:  color-mix(in srgb, var(--color-act) 85%, transparent 15%);
 
     /* Shadow */
     --color-shadow-act: color-mix(in srgb, var(--color-act) 40%, transparent 60%);
