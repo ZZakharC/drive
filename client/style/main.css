@@ -115,6 +115,16 @@ button:active, button.red:active {
     --angle: 360deg;
   }
 }
+@keyframes menu-open {
+  0% {
+    opacity: 0;
+    transform: translateY(15px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
 /* ===== TOP BAR ===== */
 .top-bar {
   display: grid;
@@ -220,6 +230,7 @@ button:active, button.red:active {
 }
 .main-bar.new-menu .new-menu {
   display: flex;
+  animation: menu-open 0.35s;
 }
 .main-bar.create-dir {
   overflow: hidden;

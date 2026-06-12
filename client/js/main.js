@@ -380,16 +380,17 @@ let activeFileBlock = null;
 function fileMenuOpen(e, file_block, file) {
     e.preventDefault();
 
-    // если уже открыто для того же блока ничего не делаем
-    if (mainContainer.classList.contains("file-menu") && activeFileBlock === file_block)
-        return;
-
     activeFileBlock = file_block;
 
     // Отрисовка
 
     mainContainer.classList.add("file-menu");
     const padding = "15px"
+
+    // Анимация
+    fileMenuDiv.style.animation = "none";
+    void fileMenuDiv.offsetWidth; // принудительный reflow
+    fileMenuDiv.style.animation = "menu-open 0.35s";
 
     // X
     fileMenuDiv.style.right = fileMenuDiv.style.left = "auto";
