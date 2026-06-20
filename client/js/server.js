@@ -69,6 +69,25 @@ export const server = {
 
     /* ----------------------- Admin ------------------------ */
 
+    // Список пользователей
+    listUsers: async () => {
+        try {
+            const res = await fetch(config.server.url + "admin/users", {
+                method: "GET",
+                headers: {
+                    "x-csrf-token": csrfToken
+                }
+            });
+
+            if (res.ok)
+                return (await res.json()).users;
+            else
+                return null;
+        } catch (error) {
+            return null;
+        }
+    },
+
     // Удаления пользователя
     deleteUser: async (id) => {
         let res = await fetch(config.server.url + "admin/users/" + id, {

@@ -17,6 +17,9 @@ const usrNameSpn = document.getElementById("name_spn");
         // Устанавливаем user
         user = res.user;
 
+        // Отображаем пользователей
+        renderUsers();
+
         usrNameSpn.textContent = user.name;
         usrNameSpn.addEventListener("click", () => { if (confirm(`Выйти из аккаунта ${user.name}?`)) server.logoutUser() });
     }
@@ -97,21 +100,14 @@ function renderUser(user) {
     uContainer.appendChild(user_block);
 }
 
-// Load users
-(async () => {
-    const res = await fetch(config.server.url + "admin/users", {
-        method: "GET",
-        headers: {
-            "x-csrf-token": csrfToken
-        }
-    });
-    let body = await res.json();
+function renderUsers() {
+    const users = await server.listUsers();
 
-    if (!res.ok)
-        alert("Error: " + res.status);
+    if (!users)
+        alert("Error");
     else
-        body.users.forEach(user => { renderUser(user); });
-})();
+        users.forEach(user => { renderUser(user); });
+}
 
 // Apply changes
 applyBtn.onclick = async () => {
