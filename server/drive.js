@@ -225,7 +225,7 @@ export async function listFiles(pathDir) {
     const list = await Promise.all(
         entries.map(async (entry) => {
             const fullPath = path.join(rep.data, entry.name);
-            const urlPath = path.join(url, entry.name).replace(/\\/g, "/");
+            const urlPath = fullPath.replace(BASE_DIR, "").replace(/\\/g, "/");
 
             if (entry.isDirectory()) {
                 return {
