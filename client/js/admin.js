@@ -100,7 +100,7 @@ function renderUser(user) {
     uContainer.appendChild(user_block);
 }
 
-function renderUsers() {
+async function renderUsers() {
     const users = await server.listUsers();
 
     if (!users)
@@ -116,6 +116,8 @@ applyBtn.onclick = async () => {
         rules
     }));
 
-    if (await server.changeUsers(users))
+    if (await server.changeUsers(users)) {
         applyBtn.classList.add("off");
+        renderUsers();
+    }
 }
